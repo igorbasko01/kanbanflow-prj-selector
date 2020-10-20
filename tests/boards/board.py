@@ -35,6 +35,8 @@ class MyTestCase(unittest.TestCase):
         board = Board('test')
         self.assertEqual(board.name, 'My first board')
         self.assertEqual(board.id, '4ce35948f9ddf9b8c8d11e273f05bd43')
+        self.assertEqual(len(board.columns), len(board_sample_response()["columns"]))
+        self.assertEqual(len(board.swimlanes), len(board_sample_response()["swimlanes"]))
 
 
 def board_sample_response():
