@@ -10,4 +10,4 @@ def start(board_token_path):
     log = logging.getLogger()
     log.info("Going to read the following boards file %s", board_token_path)
     boards = Boards(board_token_path).fetch()
-    log.info(boards)
+    log.info(f"Pulled {len(boards.boards)} boards.")
