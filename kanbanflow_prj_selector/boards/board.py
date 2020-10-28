@@ -8,13 +8,13 @@ from .task import Task
 
 
 class Board(object):
-
     def __init__(self, token):
         self.log = logging.getLogger()
-        self.FULL_BOARD_URL = f"{KFLOW_BASE_URL}board"
-        self.FULL_TASKS_URL = f"{KFLOW_BASE_URL}tasks"
+        self.FULL_BOARD_URL = f"{KFLOW_BASE_URL}/board"
+        self.FULL_TASKS_URL = f"{KFLOW_BASE_URL}/tasks"
         (self.id, self.name, self.columns, self.swimlanes) = self.parse_board(self.fetch_board_json(token))
-        self.tasks = [self.fetch_tasks_by_column(column, self.name, token) for column in self.columns]
+        tasks_by_column = [self.fetch_tasks_by_column(column, self.name, token) for column in self.columns]
+        self.tasks = self.flatten_tasks(tasks_by_column)
 
     def fetch_board_json(self, token):
         self.log.info("Pulling token: %s", token)
@@ -27,6 +27,9 @@ class Board(object):
         swimlanes = [Swimlane(lane_dict) for lane_dict in board_dict["swimlanes"]]
         return board_dict["_id"], board_dict['name'], columns, swimlanes
 
+    def flatten_tasks(self, lists_of_tasks):
+        return [task for sublist in lists_of_tasks for task in sublist]
+
     def fetch_tasks_by_column(self, column, board_name, token):
         self.log.info("Pulling tasks for %s column in %s board", column.name, board_name)
 
@@ -37,7 +40,7 @@ class Board(object):
             self.log.info("Status code: %s", resp.status_code)
             resp_dict = resp.json()
             tasks = [Task(t_dict) for t_dict in resp_dict[0]["tasks"]]
-            if resp_dict[0]["tasksLimited"] == "true":
+            if resp_dict[0].get("tasksLimited"):
                 tasks.extend(fetch_tasks(column_id, resp_dict[0]["nextTaskId"]))
             return tasks
 
