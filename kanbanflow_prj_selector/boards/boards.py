@@ -1,18 +1,26 @@
 import csv
+from ..boards.board import Board
 
 
 class Boards(object):
 
     def __init__(self, path):
-        tokens = self._read_boards_list(path)
-        boards = self._pull_boards(tokens)
+        self.path = path
+        self.tokens = None
+        self.boards = None
 
-    def _read_boards_list(self, path):
-        with open(path, 'r') as f:
-            return csv.DictReader(f)
+    def fetch(self):
+        self.tokens = self._read_board_tokens(self.path)
+        self.boards = self._pull_boards(self.tokens)
+        return self
+
+    def _read_board_tokens(self, path):
+        with open(path, 'rt') as f:
+            tokens = [line["token"] for line in csv.DictReader(f, fieldnames=["board_name", "token"])]
+            return tokens
 
     def _pull_boards(self, tokens):
-        raise NotImplementedError
+        return [Board(token) for token in tokens]
 
-    def _pull_board(self, board_token):
-        raise NotImplementedError
+    def __str__(self):
+        return f"{{ File path: {self.path}. Tokens: {self.tokens}. Boards: {self.boards} }}"

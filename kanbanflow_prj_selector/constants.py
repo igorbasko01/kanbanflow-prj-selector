@@ -1,1 +1,1 @@
-KFLOW_BASE_URL = "https://kanbanflow.com/api/v1/"
+KFLOW_BASE_URL = "https://kanbanflow.com/api/v1"

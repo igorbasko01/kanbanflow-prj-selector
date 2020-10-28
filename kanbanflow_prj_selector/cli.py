@@ -2,13 +2,14 @@
 import sys
 import click
 
+from .kanbanflow_prj_selector import start
+
 
 @click.command()
-def main(args=None):
+@click.option('-f', '--board-token-path', help='Input file with board tokens to fetch', required=True)
+def main(board_token_path):
     """Console script for kanbanflow_prj_selector."""
-    click.echo("Replace this message by putting your code into "
-               "kanbanflow_prj_selector.cli.main")
-    click.echo("See click documentation at https://click.palletsprojects.com/")
+    start(board_token_path)
     return 0
 
 

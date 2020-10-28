@@ -4,6 +4,7 @@ from unittest import mock
 from kanbanflow_prj_selector.constants import KFLOW_BASE_URL
 from kanbanflow_prj_selector.boards.board import Board
 
+
 # Used the following solution for mocking the requests library: https://stackoverflow.com/a/28507806/6926045
 # This method will be used by the mock to replace requests.get
 def mocked_requests_get(*args, **kwargs):
@@ -17,8 +18,12 @@ def mocked_requests_get(*args, **kwargs):
 
     if args[0] == f"{KFLOW_BASE_URL}/board?apiToken=test":
         return MockResponse(board_sample_response(), 200)
-    elif args[0] == 'http://someotherurl.com/anothertest.json':
-        return MockResponse({"key2": "value2"}, 200)
+    elif args[0] == f"{KFLOW_BASE_URL}/tasks?apiToken=test&columnId=todo":
+        return MockResponse(tasks1_sample_response(), 200)
+    elif args[0] == f"{KFLOW_BASE_URL}/tasks?apiToken=test&columnId=todo&startTaskId=124":
+        return MockResponse(tasks2_sample_response(), 200)
+    elif args[0].startswith(f"{KFLOW_BASE_URL}/tasks?apiToken=test&columnId="):
+        return MockResponse([{"tasks": []}], 200)
 
     return MockResponse(None, 404)
 
@@ -35,6 +40,49 @@ class MyTestCase(unittest.TestCase):
         board = Board('test')
         self.assertEqual(board.name, 'My first board')
         self.assertEqual(board.id, '4ce35948f9ddf9b8c8d11e273f05bd43')
+        self.assertEqual(len(board.columns), len(board_sample_response()["columns"]))
+        self.assertEqual(len(board.swimlanes), len(board_sample_response()["swimlanes"]))
+        self.assertEqual(len(tasks1_sample_response()[0]["tasks"]) + len(tasks2_sample_response()[0]["tasks"]),
+                         len(board.tasks))
+
+
+def tasks1_sample_response():
+    return [
+        {
+            "columnId": "todo",
+            "columnName": "ToDo",
+            "tasksLimited": True,
+            "nextTaskId": "124",
+            "tasks": [
+                {
+                    "_id": "123",
+                    "name": "Write report",
+                    "description": "",
+                    "color": "red",
+                    "columnId": "todo"
+                }
+            ]
+        }
+    ]
+
+
+def tasks2_sample_response():
+    return [
+        {
+            "columnId": "todo",
+            "columnName": "ToDo",
+            "tasksLimited": False,
+            "tasks": [
+                {
+                    "_id": "124",
+                    "name": "Write report",
+                    "description": "",
+                    "color": "red",
+                    "columnId": "todo"
+                }
+            ]
+        }
+    ]
 
 
 def board_sample_response():
@@ -44,19 +92,19 @@ def board_sample_response():
         "columns": [
             {
                 "name": "To-do",
-                "uniqueId": "7ca19de0403f11e282ebef81383f3229"
+                "uniqueId": "todo"
             },
             {
                 "name": "Do today",
-                "uniqueId": "51568f1122ad11e2b170797953ad5957"
+                "uniqueId": "today"
             },
             {
                 "name": "In progress",
-                "uniqueId": "7636db00403f11e282ebef81383f3229"
+                "uniqueId": "progress"
             },
             {
                 "name": "Done",
-                "uniqueId": "531d50e0452a11e396781dd58bf1fcf3"
+                "uniqueId": "done"
             }
         ],
         "swimlanes": [
@@ -82,6 +130,7 @@ def board_sample_response():
             }
         ]
     }
+
 
 if __name__ == '__main__':
     unittest.main()
