@@ -14,6 +14,9 @@ class Task(object):
                task_dict.get("totalSecondsSpent"), \
                task_dict.get("totalSecondsEstimate")
 
+    def get_spent_est_ratio(self):
+        return self.spent / self.est
+
     def __str__(self):
         return f"{{ Name: {self.name}. Id: {self.id}. Spent: {self.spent}. Estimated: {self.est} }}"
 
