@@ -46,6 +46,9 @@ class Board(object):
 
         return fetch_tasks(column.uniqueId)
 
+    def get_spent_time(self):
+        return sum([task.spent for task in self.tasks])
+
     def __str__(self):
         return f"{{ Id: {self.id}. Name: {self.name}. Columns: {self.columns}. Swimlanes: {self.swimlanes}. Tasks: {self.tasks} }}"
 
