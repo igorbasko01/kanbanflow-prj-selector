@@ -44,6 +44,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(len(board.swimlanes), len(board_sample_response()["swimlanes"]))
         self.assertEqual(len(tasks1_sample_response()[0]["tasks"]) + len(tasks2_sample_response()[0]["tasks"]),
                          len(board.tasks))
+        self.assertEqual(7000, board.get_spent_time())
 
 
 def tasks1_sample_response():
@@ -59,7 +60,9 @@ def tasks1_sample_response():
                     "name": "Write report",
                     "description": "",
                     "color": "red",
-                    "columnId": "todo"
+                    "columnId": "todo",
+                    "totalSecondsSpent": 4000,
+                    "totalSecondsEstimate": 3600
                 }
             ]
         }
@@ -78,7 +81,9 @@ def tasks2_sample_response():
                     "name": "Write report",
                     "description": "",
                     "color": "red",
-                    "columnId": "todo"
+                    "columnId": "todo",
+                    "totalSecondsSpent": 3000,
+                    "totalSecondsEstimate": 3600
                 }
             ]
         }
